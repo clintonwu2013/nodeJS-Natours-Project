@@ -2,7 +2,6 @@ const express = require('express');
 
 const app = express();
 const morgan = require("morgan");
-const port = 8080;
 
 const tourRouter = require("./routes/tourRoutes")
 const userRouter = require("./routes/userRoutes")
@@ -33,7 +32,5 @@ app.post('/', (req, res) => {
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
+module.exports = app;
 
-app.listen(port, () => {
-  console.log(`App is running on port ${port}`)
-})
