@@ -1,51 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-        .dropdown {
-            display: inline-block;
-            position: relative;
-        }
-        .dropdown-content {
-            display: none;
-            position: absolute; /*relative: move from the element original position, absolute: move from parent element position which has relative position.*/
-            top:0px;
-            left: 100%;
-            width: 100%;
-            overflow: auto;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-        }
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
+      .dropdown {
+        display: inline-block;
+        position: relative;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute; /*relative: move from the element original position, absolute: move from parent element position which has relative position.*/
+        top: 0px;
+        left: 100%;
+        width: 100%;
+        overflow: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      }
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
 
-        .dropdown-content a {
-            display: block;
-            color: #000000;
-            padding: 5px;
-            text-decoration: none;
-        }
+      .dropdown-content a {
+        display: block;
+        color: #000000;
+        padding: 5px;
+        text-decoration: none;
+      }
 
-        .dropdown-content a:hover {
-            color: #FFFFFF;
-            background-color: #00A4BD;
-        }
-
+      .dropdown-content a:hover {
+        color: #ffffff;
+        background-color: #00a4bd;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="dropdown">
-        <button>HubSpot Resources</button>
-        <div class="dropdown-content">
-            <a href="https://blog.hubspot.com/">Blog</a>
-            <a href="https://academy.hubspot.com/">Academy</a>
-            <a href="https://www.youtube.com/user/hubspot">YouTube</a>
-        </div>
+      <button>HubSpot Resources</button>
+      <div class="dropdown-content">
+        <a href="https://blog.hubspot.com/">Blog</a>
+        <a href="https://academy.hubspot.com/">Academy</a>
+        <a href="https://www.youtube.com/user/hubspot">YouTube</a>
+      </div>
     </div>
-    
-</body>
+  </body>
 </html>
