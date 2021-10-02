@@ -43,6 +43,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+  // 1) get token
   let token;
   if (
     req.headers.authorization &&
@@ -53,13 +54,26 @@ exports.protect = catchAsync(async (req, res, next) => {
   if (!token) {
     return next(new AppError("you are logged in", 401));
   }
+
+  // 2) verify token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   //console.log(decoded);
+
+  // 3) check user exists
   const freshUser = await User.findById(decoded.id);
   if (!freshUser) {
     return next(
       new AppError("the token belongs to a user that does not exist", 401)
     );
   }
+
+  // 4) check if user changed password
+  if (freshUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("user recently changed password. please login again", 401)
+    );
+  }
+
+  req.user = freshUser;
   next();
 });
