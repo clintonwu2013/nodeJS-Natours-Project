@@ -52,7 +52,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
   if (!token) {
-    return next(new AppError("you are logged in", 401));
+    return next(new AppError("you are not logged in", 401));
   }
 
   // 2) verify token
@@ -77,3 +77,16 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = freshUser;
   next();
 });
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    //roles ["admin", "lead-guid"]
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("you have no permission to perform this action", 403)
+      );
+    }
+
+    next();
+  };
+};
