@@ -34,6 +34,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "please confirm your password"],
     validate: {
+      // works only when create and save
       validator: function(val) {
         return val === this.password;
       },
@@ -53,6 +54,14 @@ userSchema.pre("save", async function(next) {
   this.passwordConfirm = undefined;
   next();
 });
+userSchema.pre("save", async function(next) {
+  if (!this.isModified("password") || this.isNew) {
+    return next();
+  }
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 userSchema.methods.correctPassword = async function(
   candidatePassword,
   userPassword

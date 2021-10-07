@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const crypto = require("crypto");
 const User = require("../models/userModel");
 const catchAsync = require("./../utils/catchAsync");
 const AppError = require("./../utils/appError");
@@ -11,19 +12,22 @@ const signToken = id => {
     expiresIn: process.env.JWT_EXPIRES_IN
   });
 };
-exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = await User.create(req.body);
 
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
-  });
-  res.status(201).json({
+const createSendToken = (user, statusCode, res) => {
+  const token = signToken(user._id);
+  res.status(statusCode).json({
     status: "success",
     token,
     data: {
-      user: newUser
+      user
     }
   });
+};
+
+exports.signup = catchAsync(async (req, res, next) => {
+  const newUser = await User.create(req.body);
+
+  createSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -37,11 +41,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("incorrect email or password", 401));
   }
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: "success",
-    token
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -106,7 +106,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 3) send back email
   const resetURL = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/usersresetPassword/${resetToken}`;
+  )}/api/v1/users/resetPassword/${resetToken}`;
 
   const message = `forgot your password? submit a patch request with your new password and passConfirm to: ${resetURL}\n
   If you did not forget your password, please ignore this email.`;
@@ -128,5 +128,43 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     message: "token set to email"
   });
 });
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
 
-exports.resetPassword = (req, res, next) => {};
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new AppError("token is invalid or has expires", 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
+  createSendToken(user, 200, res);
+});
+
+exports.updataPassword = catchAsync(async (req, res, next) => {
+  // 1) get user from the collection
+  const user = await User.findById(req.user.id).select("+password");
+  // 2) check the current password is correct
+  const { passwordCurrent } = req.body;
+  if (!(await user.correctPassword(passwordCurrent, user.password))) {
+    return next(new AppError("current password is incorrect!", 401));
+  }
+  // 3) if so , update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+  // 4) log the user in
+  createSendToken(user, 200, res);
+});
