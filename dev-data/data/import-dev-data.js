@@ -19,9 +19,7 @@ mongoose
     console.log("DB connection successful!!!");
   });
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, "utf-8")
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, "utf-8"));
 
 const importData = async () => {
   try {
@@ -46,6 +44,6 @@ const deleteData = async () => {
 console.log(process.argv);
 if (process.argv[2] === "--import") {
   importData();
-} else {
+} else if (process.argv[2] === "--delete") {
   deleteData();
 }
