@@ -1,4 +1,7 @@
 /* eslint-disable*/
+const logOutBtn = document.querySelector(".nav__el.nav__el--logout");
+const loginForm = document.querySelector(".form");
+
 const login = async (email, password) => {
   try {
     const res = await axios({
@@ -21,9 +24,31 @@ const login = async (email, password) => {
     alert(err.response.data.message);
   }
 };
-document.querySelector(".form").addEventListener("submit", e => {
-  e.preventDefault();
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-  login(email, password);
-});
+if (loginForm) {
+  loginForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    login(email, password);
+  });
+}
+
+const logout = async () => {
+  try {
+    const res = await axios({
+      method: "GET",
+      url: "http://localhost:8080/api/v1/users/logout"
+    });
+
+    if (res.data.status == "success") {
+      location.reload(true);
+    }
+  } catch (err) {
+    alert(err);
+  }
+};
+
+if (logOutBtn) {
+  console.log(logOutBtn);
+  logOutBtn.addEventListener("click", logout);
+}
