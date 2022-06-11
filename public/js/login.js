@@ -1,6 +1,6 @@
 /* eslint-disable*/
 const logOutBtn = document.querySelector(".nav__el.nav__el--logout");
-const loginForm = document.querySelector(".form");
+const loginForm = document.querySelector(".form--login");
 
 const login = async (email, password) => {
   try {
